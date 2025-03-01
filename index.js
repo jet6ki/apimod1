@@ -1,15 +1,26 @@
-const express = require('express');
-const { resolve } = require('path');
+require("dotenv").config();
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const menuRoutes = require("./routes/menuRoutes");
 
 const app = express();
-const port = 3010;
+const port = process.env.PORT || 3010;
 
-app.use(express.static('static'));
+// Middleware
+app.use(cors());
+app.use(express.json()); // To parse JSON request bodies
 
-app.get('/', (req, res) => {
-  res.sendFile(resolve(__dirname, 'pages/index.html'));
-});
+// Connect to MongoDB Atlas
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
+// API Routes
+app.use("/menu", menuRoutes);
+
+// Start server
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });
